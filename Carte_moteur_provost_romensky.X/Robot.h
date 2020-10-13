@@ -10,8 +10,9 @@ typedef struct robotStateBITS {
             float vitesseGaucheCommandeCourante;
             float vitesseDroiteConsigne;
             float vitesseDroiteCommandeCourante;
+            float acceleration;
         };
     };
 } ROBOT_STATE_BITS;
 extern volatile ROBOT_STATE_BITS robotState;
-#endif /* ROBOT_H ?/
+#endif 
