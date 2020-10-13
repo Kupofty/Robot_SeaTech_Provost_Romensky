@@ -48,7 +48,7 @@ PWMSetSpeedConsigne(100, MOTEUR_GAUCHE);
 while(1){
     LED_BLANCHE = !LED_BLANCHE;
     LED_BLEUE = !LED_BLEUE;
-    if (ADCIsConversionFinished(void)==1)
+    if (ADCIsConversionFinished()==1)
     {  ADCClearConversionFinishedFlag(void);
         float ADCValue0=ADCGetResult[0];
         float ADCValue1=ADCGetResult[1];
