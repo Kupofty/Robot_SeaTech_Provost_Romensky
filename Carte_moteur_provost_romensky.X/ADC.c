@@ -6,6 +6,7 @@ unsigned char ADCResultIndex = 0;
 static unsigned int ADCResult[4];
 unsigned char ADCConversionFinishedFlag;
 
+
 /****************************************************************************************************/
 // Configuration ADC
 /****************************************************************************************************/
