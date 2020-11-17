@@ -173,14 +173,22 @@ void SetNextRobotStateInAutomaticMode() {
         
             positionObstacle = OBSTACLE_A_GAUCHE;
     
-    else if (robotState.distanceTelemetreCentre < 30) //Obstacle en face
-        
+    else if (robotState.distanceTelemetreCentre < 30 ||
+            (robotState.distanceTelemetreDroit < 15 &&
+            robotState.distanceTelemetreGauche < 15) ||
+            (robotState.distanceTelemetreExtremeDroit < 10 &&
+            robotState.distanceTelemetreExtremeGauche < 10)||
+            (robotState.distanceTelemetreDroit < 20 &&
+            robotState.distanceTelemetreExtremeGauche < 20 )||
+            (robotState.distanceTelemetreExtremeDroit < 20 &&
+             robotState.distanceTelemetreGauche < 20))
+            //Obstacle en face
             positionObstacle = OBSTACLE_EN_FACE;
     
-    else if (robotState.distanceTelemetreExtremeGauche < 10)
+    else if (robotState.distanceTelemetreExtremeGauche < 20)
             positionObstacle = OBSTACLE_A_GAUCHE;
     
-    else if( robotState.distanceTelemetreExtremeDroit < 10 &&
+    else if( robotState.distanceTelemetreExtremeDroit < 20 &&
             robotState.distanceTelemetreCentre > 30 &&
             robotState.distanceTelemetreGauche > 30 )
              positionObstacle = OBSTACLE_A_DROITE;
