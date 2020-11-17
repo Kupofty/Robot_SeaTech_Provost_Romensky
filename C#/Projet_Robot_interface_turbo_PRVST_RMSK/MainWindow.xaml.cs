@@ -29,6 +29,8 @@ namespace Projet_Robot_interface_turbo_PRVST_RMSK
         public MainWindow()
         {
             InitializeComponent();
+            serialPort1 = new ReliableSerialPort("COM3", 115200, Parity.None, 8, StopBits.One);
+            serialPort1.Open();
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
