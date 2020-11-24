@@ -21,13 +21,15 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="30"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Header="GroupEmission" Margin="0" Background="#FFDDDDDD" BorderBrush="Black" Grid.Column="1" Grid.Row="1">
+        <GroupBox Header="Emission" Margin="0" Background="#FFDDDDDD" BorderBrush="Black" Grid.Column="1" Grid.Row="1">
             <TextBox x:Name="TextBoxEmission" Margin="0" TextWrapping="Wrap" TextChanged="TextBox_TextChanged" Background="{x:Null}" BorderBrush="{x:Null}" AcceptsReturn="True" KeyUp="TextBoxEmission_KeyUp"/>
         </GroupBox>
         <GroupBox x:Name="GroupReception" Header="Reception" Margin="0" Background="#FFDDDDDD" BorderBrush="Black" Grid.Column="3" Grid.Row="1">
             <TextBox x:Name="TextBoxReception" Margin="0" TextWrapping="Wrap" TextChanged="TextBox_TextChanged_1" Background="{x:Null}" BorderBrush="{x:Null}" IsReadOnly="True" IsTabStop="False" IsUndoEnabled="False"/>
         </GroupBox>
-        <Button x:Name="buttonEnvoyer" Content="Envoyer" Grid.Column="1" HorizontalAlignment="Center" Margin="0" Grid.Row="3" VerticalAlignment="Top" Width="100" Height="30" Click="buttonEnvoyer_Click"/>
+        <Button x:Name="buttonEnvoyer" Content="Envoyer" Grid.Column="1" HorizontalAlignment="Center" Margin="126,0" Grid.Row="3" Width="100" Click="buttonEnvoyer_Click" RenderTransformOrigin="-0.41,0.8"/>
+        <Button x:Name="buttonClear" Content="Nettoyer" Grid.Column="3" HorizontalAlignment="Center" Margin="133,0,119,0" Grid.Row="3" Width="100" Click="buttonClear_Click" RenderTransformOrigin="-0.41,0.8"/>
+        <Button x:Name="buttonTest" Content="Test" Grid.Column="1" HorizontalAlignment="Center" Margin="315,0,319,0" Grid.Row="3" Width="100" Click="buttonTest_Click" RenderTransformOrigin="-0.41,0.8" Grid.ColumnSpan="3"/>
 
     </Grid>
 </Window>
