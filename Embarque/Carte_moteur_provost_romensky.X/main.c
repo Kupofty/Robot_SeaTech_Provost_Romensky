@@ -14,6 +14,7 @@
 #include "PWM.h"
 #include "ADC.h"
 #include "main.h"
+#include "UART.h"
 
 
 int main(void) {
@@ -31,6 +32,7 @@ int main(void) {
     InitTimer4(1000);
     InitTimer23();
     InitPWM();
+    OnitUART();
 //
     //LED_BLANCHE = 1;
     //LED_BLEUE = 1;
