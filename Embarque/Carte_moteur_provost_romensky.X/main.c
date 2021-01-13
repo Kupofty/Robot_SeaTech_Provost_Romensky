@@ -15,6 +15,8 @@
 #include "ADC.h"
 #include "main.h"
 #include "UART.h"
+#include "CB_TX1.h"
+
 
 
 int main(void) {
@@ -32,7 +34,7 @@ int main(void) {
     InitTimer4(1000);
     InitTimer23();
     InitPWM();
-    OnitUART();
+    InitUART();
 //
     //LED_BLANCHE = 1;
     //LED_BLEUE = 1;
@@ -85,6 +87,13 @@ int main(void) {
             else
                 LED_ORANGE = 0;
         }
+        
+        
+        
+//        SendMessageDirect((unsigned char * ) "Bonjour", 7);
+//        __delay32(4000000);
+        SendMessage((unsigned char * ) "Bonjour", 7);
+        
     }
 }
 unsigned char stateRobot;
