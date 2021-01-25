@@ -38,9 +38,9 @@ int main(void) {
     InitPWM();
     InitUART();
 //
-    //LED_BLANCHE = 1;
-    //LED_BLEUE = 1;
-    //LED_ORANGE = 1;
+    LED_BLANCHE = 0;
+    LED_BLEUE = 0;
+    LED_ORANGE = 0;
 //
 //    /****************************************************************************************************/
 //    // Boucle Principale
@@ -74,20 +74,20 @@ int main(void) {
             volts = ((float) result [0]) * 3.3 / 4096 * 3.2;
             robotState.distanceTelemetreExtremeDroit = 34 / volts - 5;
 
-            if (robotState.distanceTelemetreExtremeGauche<=distmin)
-                LED_BLANCHE = 1;
-            else
-                LED_BLANCHE=0;
-            
-            if (robotState.distanceTelemetreCentre <= distmin) 
-                LED_BLEUE = 1;
-            else
-                LED_BLEUE = 0;
-         
-            if (robotState.distanceTelemetreExtremeDroit <= distmin) 
-                LED_ORANGE = 1;
-            else
-                LED_ORANGE = 0;
+//            if (robotState.distanceTelemetreExtremeGauche<=distmin)
+//                LED_BLANCHE = 1;
+//            else
+//                LED_BLANCHE=0;
+//            
+//            if (robotState.distanceTelemetreCentre <= distmin) 
+//                LED_BLEUE = 1;
+//            else
+//                LED_BLEUE = 0;
+//         
+//            if (robotState.distanceTelemetreExtremeDroit <= distmin) 
+//                LED_ORANGE = 1;
+//            else
+//                LED_ORANGE = 0;
         }
         
         

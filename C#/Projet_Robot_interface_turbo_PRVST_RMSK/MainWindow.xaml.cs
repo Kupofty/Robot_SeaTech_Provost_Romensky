@@ -33,9 +33,10 @@ namespace Projet_Robot_interface_turbo_PRVST_RMSK
         {
             InitializeComponent();
 
-            serialPort1 = new ReliableSerialPort("COM4", 115200, Parity.None, 8, StopBits.One);
+            serialPort1 = new ReliableSerialPort("COM5", 115200, Parity.None, 8, StopBits.One);
             serialPort1.DataReceived += SerialPort1_DataReceived; 
             serialPort1.Open();
+            
 
             timerAffichage = new DispatcherTimer();
             timerAffichage.Interval = new TimeSpan(0, 0, 0, 0, 100);
@@ -44,13 +45,15 @@ namespace Projet_Robot_interface_turbo_PRVST_RMSK
 
 
         }
-
+        bool iscorrectChecksum;
 
         private void TimerAffichage_Tick(object sender, EventArgs e)
         {
             while(robot.byteListReceived.Count>0)
             {
-                TextBoxReception.Text += "0x" + robot.byteListReceived.Dequeue().ToString("X2") + " ";
+                byte c = robot.byteListReceived.Dequeue();
+                TextBoxReception.Text += "0x" + c.ToString("X2") + " ";
+                DecodeMessage(c);
             }
         }
 
@@ -60,6 +63,7 @@ namespace Projet_Robot_interface_turbo_PRVST_RMSK
             for (int i = 0; i < e.Data.Length; i++)
             {
                 robot.byteListReceived.Enqueue(e.Data[i]);
+
             }
             //foreach(var c in e.Data)
             //{
@@ -70,7 +74,7 @@ namespace Projet_Robot_interface_turbo_PRVST_RMSK
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            
         }
 
         private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
@@ -99,12 +103,17 @@ namespace Projet_Robot_interface_turbo_PRVST_RMSK
 
         private void buttonTest_Click(object sender, RoutedEventArgs e)
         {
-            byte[] byteList = new byte[20];
-            for (int i = 0; i < 20; i++)
-            {
-                byteList[i] = (byte)(2 * i);             
-            }       
+            byte[] byteList = new byte[4];
+            byteList[0] = 0x00;
+            byteList[1] = 0x020;
+            byteList[2] = 0x01;
+            byteList[3] = 0x00;
+            //for (int i = 0; i < 20; i++)
+            //{
+            //    byteList[i] = (byte)(2 * i);             
+            //}       
             serialPort1.Write(byteList, 0, byteList.Length);   
+
         }
 
 
@@ -117,7 +126,9 @@ namespace Projet_Robot_interface_turbo_PRVST_RMSK
 
         private void SendMessage()
         {
-            serialPort1.WriteLine(TextBoxEmission.Text);
+            //serialPort1.WriteLine(TextBoxEmission.Text);
+            byte[] bytes = Encoding.ASCII.GetBytes(TextBoxEmission.Text);
+            UartEncodeAndSendMessage(0x0080, bytes.Length, bytes);
             TextBoxEmission.Text = "";
         }
 
@@ -165,44 +176,130 @@ namespace Projet_Robot_interface_turbo_PRVST_RMSK
         int msgDecodedPayloadLength = 0;
         byte[] msgDecodedPayload;
         int msgDecodedPayloadIndex = 0;
-
+        
         private void DecodeMessage(byte c)
         {
             switch(rcvState)
             {
                 case StateReception.Waiting:
-                    ...
+                    if (c == 0xFE)
+                    {
+                        rcvState = StateReception.FunctionMSB;
+                    }
                         break;
                 case StateReception.FunctionMSB:
-                    ...
-                        break;
+                    msgDecodedFunction = (int)(c << 8);
+                    rcvState = StateReception.FunctionLSB;
+                    break;
                 case StateReception.FunctionLSB:
-                    ...
-                        break;
+                    msgDecodedFunction += (int)(c<<0 );
+                    rcvState = StateReception.PayLoadLengthMSB;
+                    break;
                 case StateReception.PayLoadLengthMSB:
-                    ...
-                        break;
+                    msgDecodedPayloadLength= (int)(c << 8);
+                    rcvState = StateReception.PayLoadLengthLSB;
+                    break;
                 case StateReception.PayLoadLengthLSB:
-                    ...
-                        break;
-                case StateReception.Payload:
-                    ...
-                        break;
-                case StateReception.Checksum:
-                    ...
-                    if(calculatedChecksum== receivedChecksum)
+                    msgDecodedPayloadLength += (int)(c<<0);
+                    if(msgDecodedPayloadLength==0)
+                        rcvState = StateReception.Checksum;
+                    else if(msgDecodedPayloadLength > 512)
+                        rcvState = StateReception.Waiting;
+                    else
                     {
-                        //success on a un message valide
+                        rcvState = StateReception.Payload;
+                        msgDecodedPayloadIndex = 0;
+                        msgDecodedPayload = new byte[msgDecodedPayloadLength];
                     }
-                    ...
+                    break;
+                case StateReception.Payload:
+                    msgDecodedPayload[msgDecodedPayloadIndex++] = c;
+                    if  (msgDecodedPayloadIndex==msgDecodedPayloadLength)
+                    { 
+                        rcvState = StateReception.Checksum;
+                    }
+                    break;
+
+                case StateReception.Checksum:
+                    
+                    byte receivedChecksum = c;
+                    byte calculatedChecksum = CalculateChecksum(msgDecodedFunction, msgDecodedPayloadLength, msgDecodedPayload);
+                    if(calculatedChecksum == receivedChecksum)
+                    {
+                        iscorrectChecksum = true;
+                        ProcessDecodedMessage(msgDecodedFunction, msgDecodedPayloadLength, msgDecodedPayload);
+                    }
+                    else
+                        iscorrectChecksum = false;
                     break;
                 default:
                     rcvState = StateReception.Waiting;
                     break;
             }
         }
+        void ProcessDecodedMessage(int msgFunction, int msgPayloadLength, byte[] msgPayload)
+        {
+                if (msgFunction == (int)0x0080 ) 
+                     {}
+                else if (msgFunction == (int)0x0020)   //led
+                    if (msgDecodedPayload[0] ==0x00)      //num led
+                        if (msgDecodedPayload[1] ==0x01)//etat led  
+                        { } //led1 allumée
+                        else
+                        { } // led1 eteinte
+                    else if (msgDecodedPayload[0] == 0x01) //num led
+                        if (msgDecodedPayload[1] == 0x01)//etat led  
+                        { } // led2 allumée
+                        else
+                        { } // led2 éteinte
+                    else //num led
+                         if (msgDecodedPayload[1] ==0x01)//etat led  
+                       { } //led3 allumée
+                         else
+                       { } // led3 éteinte
+                else if (msgFunction == (int)0x0030) // distance telemètre
+                { int dist1 = (int)msgDecodedPayload[0]; // telemètre 1
+                  int dist2 = (int)msgDecodedPayload[1]; //telemètre 2
+                  int dist3 = (int)msgDecodedPayload[2]; }// telemètre 3
 
+                else if (msgFunction ==(int)0x0040) //consigne vitesse
+                { int vitesse1 = (int)msgDecodedPayload[0];
+                  int vitesse2 = (int)msgDecodedPayload[1]; }
+        }
+        private void CheckBox_Checked_1(object sender, RoutedEventArgs e)
+        {
+           
+        }
 
+        private void CheckBox_Checked_2(object sender, RoutedEventArgs e)
+        {
+            //byte[] byteList = new byte[4];
+            //byteList[0] = 0x00;
+            //byteList[1] = 0x020;
+            //byteList[2] = 0x02;
+            //byteList[3] = 0x01;
+            ////for (int i = 0; i < 20; i++)
+            ////{
+            ////    byteList[i] = (byte)(2 * i);             
+            ////}       
+            //serialPort1.Write(byteList, 0, byteList.Length);
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            //byte[] byteList = new byte[4];
+            //byteList[0] = 0x00;
+            //byteList[1] = 0x020;
+            //byteList[2] = 0x03;
+            //byteList[3] = 0x01;
+            ////for (int i = 0; i < 20; i++)
+            ////{
+            ////    byteList[i] = (byte)(2 * i);             
+            ////}       
+            //serialPort1.Write(byteList, 0, byteList.Length);
+        }
+
+    
     }
 }
 
